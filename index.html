@@ -399,14 +399,7 @@
                     <!-- Subtle Dark Gradient Vignette for Legibility -->
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
 
-                    <!-- Watermark Logo PD (Optional Branding Top Right) -->
-                    <div id="pd-watermark" class="absolute top-4 right-4 flex items-center gap-2 bg-slate-950/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
-                        <svg viewBox="0 0 100 100" class="w-5 h-5 text-emerald-400 fill-current">
-                            <circle cx="50" cy="55" r="40" fill="none" stroke="currentColor" stroke-width="6" />
-                            <text x="50" y="65" font-family="Playfair Display, serif" font-size="34" font-weight="bold" text-anchor="middle" fill="currentColor">PD</text>
-                        </svg>
-                        <span class="text-[11px] font-serif tracking-widest text-white/90 font-bold">PD JEWELRY</span>
-                    </div>
+
 
                     <!-- Shop Logo Overlay (user-uploaded) -->
                     <div id="shop-logo-overlay" class="absolute hidden z-30" style="top:16px; right:16px;">
@@ -835,19 +828,7 @@
                     break;
             }
 
-            // If logo is top-right and PD watermark is also top-right, shift PD watermark
-            const pdWatermark = document.getElementById('pd-watermark');
-            if (pos === 'top-right' && shopLogoDataUrl) {
-                pdWatermark.style.top = '16px';
-                pdWatermark.style.right = 'auto';
-                pdWatermark.style.left = '50%';
-                pdWatermark.style.transform = 'translateX(-50%)';
-            } else {
-                pdWatermark.style.top = '16px';
-                pdWatermark.style.right = '16px';
-                pdWatermark.style.left = 'auto';
-                pdWatermark.style.transform = 'none';
-            }
+            // Removed logic for shifting PD watermark because it is deleted
         }
 
         function updateShopLogoSize() {
