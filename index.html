@@ -83,6 +83,57 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.18);
         }
+
+        /* Toggle switch styling */
+        .toggle-switch {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: #334155;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+        .toggle-switch:checked {
+            background: #1e5d57;
+        }
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .toggle-switch:checked::before {
+            transform: translateX(16px);
+        }
+
+        /* Logo preview thumbnail */
+        .logo-preview-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(15,23,42,0.6);
+        }
+
+        /* Download button loading state */
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .btn-loading .btn-text { display: none; }
+        .btn-loading .btn-spinner { display: inline-flex; }
+        .btn-spinner { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased">
@@ -109,13 +160,15 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="downloadTagOnly()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium rounded-lg border border-slate-700 transition flex items-center gap-2">
+                <button onclick="downloadTagOnly()" id="btn-download-tag" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium rounded-lg border border-slate-700 transition flex items-center gap-2">
                     <i class="fa-solid fa-file-image text-brand-200"></i>
-                    <span>Tải Tag Giá PNG</span>
+                    <span class="btn-text">Tải Tag Giá PNG</span>
+                    <span class="btn-spinner animate-spin"><i class="fa-solid fa-spinner"></i></span>
                 </button>
-                <button onclick="downloadFullComposite()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg shadow-brand-600/30 transition flex items-center gap-2">
+                <button onclick="downloadFullComposite()" id="btn-download-full" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg shadow-brand-600/30 transition flex items-center gap-2">
                     <i class="fa-solid fa-download"></i>
-                    <span>Tải Ảnh Sản Phẩm Hoàn Chỉnh</span>
+                    <span class="btn-text">Tải Ảnh Sản Phẩm Hoàn Chỉnh</span>
+                    <span class="btn-spinner animate-spin"><i class="fa-solid fa-spinner"></i></span>
                 </button>
             </div>
         </div>
@@ -211,15 +264,86 @@
                     </div>
                 </div>
 
-                <!-- Toggle Logo & Extra elements -->
-                <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
-                    <label class="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="toggle-logo" checked onchange="updateValues()" class="rounded border-slate-700 text-brand-600 focus:ring-0">
-                        Hiển thị Logo PD trên Tag
+                <!-- Toggle Options Section -->
+                <div class="pt-2 border-t border-slate-800 space-y-2.5">
+                    <p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Tuỳ chọn hiển thị</p>
+                    
+                    <label class="text-xs text-slate-300 flex items-center justify-between cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-fingerprint text-brand-600 w-4 text-center"></i>
+                            Hiển thị Logo PD trên Tag
+                        </span>
+                        <input type="checkbox" id="toggle-logo" checked onchange="updateValues()" class="toggle-switch">
                     </label>
-                    <label class="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="toggle-currency" checked onchange="updateValues()" class="rounded border-slate-700 text-brand-600 focus:ring-0">
-                        Hiện ký hiệu "đ"
+                    
+                    <label class="text-xs text-slate-300 flex items-center justify-between cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-dong-sign text-brand-600 w-4 text-center"></i>
+                            Hiện ký hiệu "đ"
+                        </span>
+                        <input type="checkbox" id="toggle-currency" checked onchange="updateValues()" class="toggle-switch">
+                    </label>
+
+                    <label class="text-xs text-slate-300 flex items-center justify-between cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-barcode text-brand-600 w-4 text-center"></i>
+                            Hiển thị Mã Sản Phẩm
+                        </span>
+                        <input type="checkbox" id="toggle-sku" checked onchange="updateValues()" class="toggle-switch">
+                    </label>
+
+                    <label class="text-xs text-slate-300 flex items-center justify-between cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-comment-dots text-brand-600 w-4 text-center"></i>
+                            Hiển thị Mô Tả / Chất Liệu
+                        </span>
+                        <input type="checkbox" id="toggle-material" checked onchange="updateValues()" class="toggle-switch">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Logo Upload Section -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                    <i class="fa-solid fa-store text-brand-600 mr-1.5"></i> Logo Shop (Chèn Lên Ảnh)
+                </label>
+                <div class="flex items-center gap-3">
+                    <!-- Logo preview -->
+                    <div id="shop-logo-preview-box" class="hidden">
+                        <img id="shop-logo-preview-img" class="logo-preview-thumb" src="" alt="Logo">
+                    </div>
+                    <label class="cursor-pointer px-3 py-2 text-xs bg-brand-600/20 hover:bg-brand-600/30 text-brand-200 border border-brand-600/40 rounded-lg flex items-center gap-2 transition">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Tải logo shop lên
+                        <input type="file" id="file-logo-upload" accept="image/*" onchange="handleLogoUpload(event)" class="hidden">
+                    </label>
+                    <button id="btn-remove-logo" onclick="removeShopLogo()" class="hidden px-3 py-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg flex items-center gap-2 transition">
+                        <i class="fa-solid fa-trash-can"></i> Xóa logo
+                    </button>
+                </div>
+                <!-- Logo Position & Size -->
+                <div id="logo-controls" class="hidden mt-3 space-y-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Vị trí Logo</label>
+                            <select id="logo-position" onchange="updateShopLogoPosition()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-brand-600">
+                                <option value="top-right" selected>Trên - Phải</option>
+                                <option value="top-left">Trên - Trái</option>
+                                <option value="bottom-right">Dưới - Phải</option>
+                                <option value="bottom-left">Dưới - Trái</option>
+                                <option value="center">Chính giữa</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Kích thước: <span id="logo-size-label">60</span>px</label>
+                            <input type="range" id="logo-size" min="30" max="150" value="60" oninput="updateShopLogoSize()" class="w-full accent-brand-600">
+                        </div>
+                    </div>
+                    <label class="text-xs text-slate-300 flex items-center justify-between cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-half-stroke text-brand-600 w-4 text-center"></i>
+                            Hiện nền sau logo
+                        </span>
+                        <input type="checkbox" id="toggle-logo-bg" checked onchange="updateShopLogoBg()" class="toggle-switch">
                     </label>
                 </div>
             </div>
@@ -266,13 +390,17 @@
             <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl flex items-center justify-center p-2 min-h-[460px]" id="composite-container">
                 
                 <!-- Background Image Canvas Wrapper -->
-                <div id="product-canvas-wrapper" class="relative w-full max-w-[620px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-cover bg-center transition-all duration-300" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80');">
+                <div id="product-canvas-wrapper" class="relative w-full max-w-[620px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-slate-900 transition-all duration-300">
                     
+                    <!-- Actual product image rendered inside (for CORS-safe export) -->
+                    <img id="product-bg-img" crossorigin="anonymous" src="" alt="" class="absolute inset-0 w-full h-full object-cover" style="display:none;">
+                    <canvas id="product-bg-canvas" class="absolute inset-0 w-full h-full object-cover"></canvas>
+
                     <!-- Subtle Dark Gradient Vignette for Legibility -->
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
 
                     <!-- Watermark Logo PD (Optional Branding Top Right) -->
-                    <div class="absolute top-4 right-4 flex items-center gap-2 bg-slate-950/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
+                    <div id="pd-watermark" class="absolute top-4 right-4 flex items-center gap-2 bg-slate-950/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
                         <svg viewBox="0 0 100 100" class="w-5 h-5 text-emerald-400 fill-current">
                             <circle cx="50" cy="55" r="40" fill="none" stroke="currentColor" stroke-width="6" />
                             <text x="50" y="65" font-family="Playfair Display, serif" font-size="34" font-weight="bold" text-anchor="middle" fill="currentColor">PD</text>
@@ -280,8 +408,15 @@
                         <span class="text-[11px] font-serif tracking-widest text-white/90 font-bold">PD JEWELRY</span>
                     </div>
 
+                    <!-- Shop Logo Overlay (user-uploaded) -->
+                    <div id="shop-logo-overlay" class="absolute hidden z-30" style="top:16px; right:16px;">
+                        <div id="shop-logo-overlay-inner" class="bg-slate-950/50 backdrop-blur-md rounded-xl p-1.5 border border-white/10 shadow-lg">
+                            <img id="shop-logo-overlay-img" src="" alt="Shop Logo" class="block" style="width:60px; height:60px; object-fit:contain;">
+                        </div>
+                    </div>
+
                     <!-- Top Left Product Label -->
-                    <div class="absolute top-4 left-4 text-white">
+                    <div id="preview-info-block" class="absolute top-4 left-4 text-white">
                         <div id="preview-sku-tag" class="text-xs font-semibold tracking-wide bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-md border border-white/10 text-emerald-300 shadow">
                             Mặt Dây Duyên Dáng PD-102
                         </div>
@@ -404,12 +539,61 @@
         // State variables
         let currentTemplate = 'discount'; // 'discount' or 'single'
         let currentTheme = 'teal';
+        let shopLogoDataUrl = null; // Stores the uploaded shop logo
+        let bgImageDataUrl = null; // Stores bg image as data URL for CORS-safe export
 
         // Initialize state on load
         window.onload = function() {
+            // Load default background as data URL to avoid CORS
+            loadBgImage('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80');
             updateValues();
             setupDraggable();
         };
+
+        // Load background image onto canvas (CORS-safe approach)
+        function loadBgImage(url) {
+            const canvas = document.getElementById('product-bg-canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                // Set canvas to match wrapper dimensions
+                const wrapper = document.getElementById('product-canvas-wrapper');
+                canvas.width = wrapper.offsetWidth * 2; // 2x for retina quality
+                canvas.height = wrapper.offsetHeight * 2;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                bgImageDataUrl = canvas.toDataURL('image/png');
+            };
+            img.onerror = function() {
+                // If CORS fails, try via proxy or just show placeholder
+                console.warn('Could not load image with CORS. Trying without...');
+                // Draw a gradient placeholder
+                const wrapper = document.getElementById('product-canvas-wrapper');
+                canvas.width = wrapper.offsetWidth * 2;
+                canvas.height = wrapper.offsetHeight * 2;
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                grad.addColorStop(0, '#1e293b');
+                grad.addColorStop(1, '#0f172a');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            };
+            img.src = url;
+        }
+
+        // Load image from local file (always CORS-safe)
+        function loadBgFromDataUrl(dataUrl) {
+            const canvas = document.getElementById('product-bg-canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.onload = function() {
+                const wrapper = document.getElementById('product-canvas-wrapper');
+                canvas.width = wrapper.offsetWidth * 2;
+                canvas.height = wrapper.offsetHeight * 2;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                bgImageDataUrl = dataUrl;
+            };
+            img.src = dataUrl;
+        }
 
         // Format currency strings with thousand separators
         function formatNumber(val) {
@@ -506,12 +690,28 @@
             
             const showLogo = document.getElementById('toggle-logo').checked;
             const showCurr = document.getElementById('toggle-currency').checked;
+            const showSku = document.getElementById('toggle-sku').checked;
+            const showMaterial = document.getElementById('toggle-material').checked;
 
             const unit = showCurr ? 'đ' : '';
 
-            // Update Top Left Info
-            document.getElementById('preview-sku-tag').innerText = sku;
-            document.getElementById('preview-material-tag').innerText = material;
+            // Update Top Left Info (SKU & Material visibility)
+            const skuTag = document.getElementById('preview-sku-tag');
+            const matTag = document.getElementById('preview-material-tag');
+            const infoBlock = document.getElementById('preview-info-block');
+
+            skuTag.innerText = sku;
+            matTag.innerText = material;
+
+            skuTag.style.display = showSku ? 'block' : 'none';
+            matTag.style.display = showMaterial ? 'block' : 'none';
+
+            // Hide entire info block if both are off
+            if (!showSku && !showMaterial) {
+                infoBlock.style.display = 'none';
+            } else {
+                infoBlock.style.display = 'block';
+            }
 
             // Update Discount Tag
             document.getElementById('tag-label-old').innerText = labelOld;
@@ -543,26 +743,132 @@
 
         // Switch background preset photos
         function setBgPreset(type) {
-            const wrapper = document.getElementById('product-canvas-wrapper');
             if (type === 'box') {
-                wrapper.style.backgroundImage = "url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80')";
+                loadBgImage('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80');
             } else if (type === 'ring') {
-                wrapper.style.backgroundImage = "url('https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=80')";
+                loadBgImage('https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=80');
             }
         }
 
-        // Handle user uploaded photo
+        // Handle user uploaded product photo
         function handleImageUpload(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const wrapper = document.getElementById('product-canvas-wrapper');
-                    wrapper.style.backgroundImage = `url('${event.target.result}')`;
+                    loadBgFromDataUrl(event.target.result);
                 };
                 reader.readAsDataURL(file);
             }
         }
+
+        // ========== SHOP LOGO FUNCTIONS ==========
+
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    shopLogoDataUrl = event.target.result;
+
+                    // Show preview in controls
+                    document.getElementById('shop-logo-preview-box').classList.remove('hidden');
+                    document.getElementById('shop-logo-preview-img').src = shopLogoDataUrl;
+                    document.getElementById('btn-remove-logo').classList.remove('hidden');
+                    document.getElementById('logo-controls').classList.remove('hidden');
+
+                    // Show overlay on canvas
+                    const overlay = document.getElementById('shop-logo-overlay');
+                    const overlayImg = document.getElementById('shop-logo-overlay-img');
+                    overlay.classList.remove('hidden');
+                    overlayImg.src = shopLogoDataUrl;
+
+                    updateShopLogoPosition();
+                    updateShopLogoSize();
+                    updateShopLogoBg();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeShopLogo() {
+            shopLogoDataUrl = null;
+            document.getElementById('shop-logo-overlay').classList.add('hidden');
+            document.getElementById('shop-logo-preview-box').classList.add('hidden');
+            document.getElementById('btn-remove-logo').classList.add('hidden');
+            document.getElementById('logo-controls').classList.add('hidden');
+            document.getElementById('file-logo-upload').value = '';
+        }
+
+        function updateShopLogoPosition() {
+            const pos = document.getElementById('logo-position').value;
+            const overlay = document.getElementById('shop-logo-overlay');
+
+            // Reset all position styles
+            overlay.style.top = 'auto';
+            overlay.style.bottom = 'auto';
+            overlay.style.left = 'auto';
+            overlay.style.right = 'auto';
+            overlay.style.transform = 'none';
+
+            switch(pos) {
+                case 'top-right':
+                    overlay.style.top = '16px';
+                    overlay.style.right = '16px';
+                    break;
+                case 'top-left':
+                    overlay.style.top = '16px';
+                    overlay.style.left = '16px';
+                    break;
+                case 'bottom-right':
+                    overlay.style.bottom = '100px';
+                    overlay.style.right = '16px';
+                    break;
+                case 'bottom-left':
+                    overlay.style.bottom = '100px';
+                    overlay.style.left = '16px';
+                    break;
+                case 'center':
+                    overlay.style.top = '50%';
+                    overlay.style.left = '50%';
+                    overlay.style.transform = 'translate(-50%, -50%)';
+                    break;
+            }
+
+            // If logo is top-right and PD watermark is also top-right, shift PD watermark
+            const pdWatermark = document.getElementById('pd-watermark');
+            if (pos === 'top-right' && shopLogoDataUrl) {
+                pdWatermark.style.top = '16px';
+                pdWatermark.style.right = 'auto';
+                pdWatermark.style.left = '50%';
+                pdWatermark.style.transform = 'translateX(-50%)';
+            } else {
+                pdWatermark.style.top = '16px';
+                pdWatermark.style.right = '16px';
+                pdWatermark.style.left = 'auto';
+                pdWatermark.style.transform = 'none';
+            }
+        }
+
+        function updateShopLogoSize() {
+            const size = document.getElementById('logo-size').value;
+            document.getElementById('logo-size-label').innerText = size;
+            const overlayImg = document.getElementById('shop-logo-overlay-img');
+            overlayImg.style.width = size + 'px';
+            overlayImg.style.height = size + 'px';
+        }
+
+        function updateShopLogoBg() {
+            const showBg = document.getElementById('toggle-logo-bg').checked;
+            const inner = document.getElementById('shop-logo-overlay-inner');
+            if (showBg) {
+                inner.className = 'bg-slate-950/50 backdrop-blur-md rounded-xl p-1.5 border border-white/10 shadow-lg';
+            } else {
+                inner.className = 'p-0';
+            }
+        }
+
+        // ========== DRAGGABLE ==========
 
         // Draggable tag functionality on canvas
         function setupDraggable() {
@@ -628,8 +934,13 @@
             }
         }
 
+        // ========== DOWNLOAD FUNCTIONS (CORS-SAFE) ==========
+
         // Download tag graphic only as PNG
         function downloadTagOnly() {
+            const btn = document.getElementById('btn-download-tag');
+            btn.classList.add('btn-loading');
+
             const target = currentTemplate === 'discount' 
                 ? document.getElementById('tag-template-discount') 
                 : document.getElementById('tag-template-single');
@@ -637,27 +948,58 @@
             html2canvas(target, {
                 backgroundColor: null,
                 scale: 3,
-                useCORS: true
+                useCORS: true,
+                allowTaint: false
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Tag-Gia-PD-Jewelry-${currentTemplate}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+            }).catch(err => {
+                console.error('Download tag error:', err);
+                alert('Lỗi khi tải tag giá. Vui lòng thử lại.');
+            }).finally(() => {
+                btn.classList.remove('btn-loading');
             });
         }
 
-        // Download complete composite photo with tag
+        // Download complete composite photo with tag (CORS-safe)
         function downloadFullComposite() {
+            const btn = document.getElementById('btn-download-full');
+            btn.classList.add('btn-loading');
+
             const target = document.getElementById('product-canvas-wrapper');
 
             html2canvas(target, {
                 scale: 2,
-                useCORS: true
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: '#0f172a',
+                onclone: function(clonedDoc) {
+                    // Ensure the canvas in the clone has the image drawn
+                    const clonedCanvas = clonedDoc.getElementById('product-bg-canvas');
+                    if (clonedCanvas && bgImageDataUrl) {
+                        const ctx = clonedCanvas.getContext('2d');
+                        const img = new Image();
+                        img.src = bgImageDataUrl;
+                        // The image should already be loaded since it's a data URL
+                        try {
+                            ctx.drawImage(img, 0, 0, clonedCanvas.width, clonedCanvas.height);
+                        } catch(e) {
+                            console.warn('Could not draw bg in clone:', e);
+                        }
+                    }
+                }
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Anh-Trang-Suc-PD-Jewelry.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+            }).catch(err => {
+                console.error('Download composite error:', err);
+                alert('Lỗi khi tải ảnh. Vui lòng thử lại.');
+            }).finally(() => {
+                btn.classList.remove('btn-loading');
             });
         }
     </script>
