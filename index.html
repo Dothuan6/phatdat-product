@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD Jewelry - Thiết Kế Bảng Giá Sản Phẩm</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Be Vietnam Pro & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- html2canvas for exporting high-res PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f2f8f7',
+                            100: '#e1f0ee',
+                            200: '#c5e2dd',
+                            600: '#1e5d57', // Main Teal Color from Logo
+                            700: '#184d48',
+                            800: '#143f3b',
+                            900: '#103431',
+                        },
+                        gold: {
+                            400: '#f3c669',
+                            500: '#e5b23d',
+                            600: '#c29227',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        /* Slanted slash angle clip path effect like user requested sample */
+        .clip-slanted-right {
+            clip-path: polygon(18% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+        
+        .clip-slanted-left {
+            clip-path: polygon(0 0, 82% 0, 100% 100%, 0% 100%);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1e5d57;
+        }
+
+        /* Glassmorphism overlays */
+        .glass-panel {
+            background: rgba(30, 93, 87, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Vector Brand Logo -->
+                <div class="w-10 h-10 rounded-full bg-slate-800 border border-brand-600/40 flex items-center justify-center p-1.5 shadow-lg">
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-brand-600 fill-current">
+                        <path d="M50 5 L62 25 L38 25 Z" fill="none" stroke="currentColor" stroke-width="3" />
+                        <circle cx="50" cy="55" r="40" fill="none" stroke="currentColor" stroke-width="5" />
+                        <circle cx="50" cy="55" r="32" fill="none" stroke="currentColor" stroke-width="2" />
+                        <text x="50" y="65" font-family="Playfair Display, serif" font-size="34" font-weight="bold" text-anchor="middle" fill="currentColor">PD</text>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white tracking-wide flex items-center gap-2">
+                        PD JEWELRY 
+                        <span class="text-xs bg-brand-600/30 text-brand-200 border border-brand-600/50 px-2 py-0.5 rounded-full font-normal">Thiết Kế Bảng Giá</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Tạo mác giá thương hiệu cho sản phẩm trang sức cao cấp</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="downloadTagOnly()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium rounded-lg border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-image text-brand-200"></i>
+                    <span>Tải Tag Giá PNG</span>
+                </button>
+                <button onclick="downloadFullComposite()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg shadow-brand-600/30 transition flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Tải Ảnh Sản Phẩm Hoàn Chỉnh</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: Control Panel & Form Inputs -->
+        <div class="lg:col-span-5 space-y-5">
+            
+            <!-- Template Type Selector -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                    <i class="fa-solid fa-layer-group text-brand-600 mr-1.5"></i> Chọn Loại Bảng Giá
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" id="btn-discount" onclick="setTemplate('discount')" class="p-3 rounded-xl border border-brand-600 bg-brand-600/10 text-white flex flex-col items-center text-center transition hover:border-brand-500">
+                        <i class="fa-solid fa-tags text-xl mb-1 text-emerald-400"></i>
+                        <span class="text-xs font-bold">1. Mẫu Có Giảm Giá</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Giá cũ + Giá khuyến mãi</span>
+                    </button>
+                    <button type="button" id="btn-single" onclick="setTemplate('single')" class="p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-300 flex flex-col items-center text-center transition hover:border-brand-500">
+                        <i class="fa-solid fa-gem text-xl mb-1 text-gold-400"></i>
+                        <span class="text-xs font-bold">2. Mẫu 1 Giá</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Giá niêm yết chuẩn</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customization Form Controls -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                <h3 class="text-sm font-semibold text-white border-b border-slate-800 pb-2 flex items-center justify-between">
+                    <span><i class="fa-solid fa-sliders text-brand-600 mr-2"></i> Tùy Chỉnh Thông Tin Tag</span>
+                    <span id="badge-mode" class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">Bản Giảm Giá</span>
+                </h3>
+
+                <!-- Product Name / Code -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Mã Sản Phẩm / Tên</label>
+                        <input type="text" id="input-sku" value="Mặt Dây Duyên Dáng PD-102" oninput="updateValues()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Chất Liệu / Ghi Chú</label>
+                        <input type="text" id="input-material" value="Vàng 18K & Kim Cương" oninput="updateValues()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-600">
+                    </div>
+                </div>
+
+                <!-- Price Inputs -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div id="container-old-price">
+                        <label class="block text-xs text-slate-400 mb-1">Giá Cũ (đ)</label>
+                        <input type="text" id="input-old-price" value="10.225.000" oninput="formatAndUpdatePrice('input-old-price')" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-600 font-mono">
+                    </div>
+                    <div>
+                        <label id="label-new-price" class="block text-xs text-slate-400 mb-1">Giá Ưu Đãi (đ)</label>
+                        <input type="text" id="input-new-price" value="9.202.500" oninput="formatAndUpdatePrice('input-new-price')" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-emerald-400 font-bold focus:outline-none focus:border-brand-600 font-mono">
+                    </div>
+                </div>
+
+                <!-- Label Texts -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div id="container-label-old">
+                        <label class="block text-xs text-slate-400 mb-1">Nhãn Giá Cũ</label>
+                        <input type="text" id="input-label-old" value="GIÁ CŨ" oninput="updateValues()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Nhãn Giá Bán</label>
+                        <input type="text" id="input-label-new" value="CHỈ CÒN" oninput="updateValues()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-600">
+                    </div>
+                </div>
+
+                <!-- Style Variant Options -->
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1.5">Tông Màu Tag Giá</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button type="button" onclick="setColorTheme('teal')" class="p-2 rounded-lg bg-slate-800 border border-slate-700 flex flex-col items-center gap-1 hover:bg-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-[#1e5d57] block border border-white/20"></span>
+                            <span class="text-[10px] text-slate-300">Teal PD</span>
+                        </button>
+                        <button type="button" onclick="setColorTheme('emerald')" class="p-2 rounded-lg bg-slate-800 border border-slate-700 flex flex-col items-center gap-1 hover:bg-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-emerald-700 block border border-white/20"></span>
+                            <span class="text-[10px] text-slate-300">Ngọc Lục</span>
+                        </button>
+                        <button type="button" onclick="setColorTheme('dark')" class="p-2 rounded-lg bg-slate-800 border border-slate-700 flex flex-col items-center gap-1 hover:bg-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-slate-950 block border border-white/20"></span>
+                            <span class="text-[10px] text-slate-300">Đen Đêm</span>
+                        </button>
+                        <button type="button" onclick="setColorTheme('gold')" class="p-2 rounded-lg bg-slate-800 border border-slate-700 flex flex-col items-center gap-1 hover:bg-slate-700">
+                            <span class="w-5 h-5 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 block border border-white/20"></span>
+                            <span class="text-[10px] text-slate-300">Ánh Vàng</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Toggle Logo & Extra elements -->
+                <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+                    <label class="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="toggle-logo" checked onchange="updateValues()" class="rounded border-slate-700 text-brand-600 focus:ring-0">
+                        Hiển thị Logo PD trên Tag
+                    </label>
+                    <label class="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="toggle-currency" checked onchange="updateValues()" class="rounded border-slate-700 text-brand-600 focus:ring-0">
+                        Hiện ký hiệu "đ"
+                    </label>
+                </div>
+            </div>
+
+            <!-- Product Background Switcher -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                    <i class="fa-solid fa-image text-brand-600 mr-1.5"></i> Phông Nền Ảnh Sản Phẩm
+                </label>
+                <div class="flex items-center gap-3">
+                    <button onclick="setBgPreset('box')" class="flex-1 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700">
+                        Hộp Trang Sức Hồng (Giống Mẫu)
+                    </button>
+                    <button onclick="setBgPreset('ring')" class="flex-1 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700">
+                        Nền Tối Sang Trọng
+                    </button>
+                    <label class="cursor-pointer px-3 py-1.5 text-xs bg-brand-600/20 hover:bg-brand-600/30 text-brand-200 border border-brand-600/40 rounded-lg flex items-center gap-1">
+                        <i class="fa-solid fa-upload"></i> Tải ảnh shop
+                        <input type="file" id="file-upload" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Live Interactive Preview & Canvas -->
+        <div class="lg:col-span-7 flex flex-col space-y-4">
+
+            <!-- Card Header -->
+            <div class="flex items-center justify-between bg-slate-900 px-4 py-3 border border-slate-800 rounded-xl">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs font-semibold text-slate-200">XEM TRƯỚC TRỰC TIẾP (LIVE PREVIEW)</span>
+                </div>
+                <div class="text-xs text-slate-400">
+                    Kéo vị trí tag trên ảnh bên dưới
+                </div>
+            </div>
+
+            <!-- Main Product Visualizer Area -->
+            <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl flex items-center justify-center p-2 min-h-[460px]" id="composite-container">
+                
+                <!-- Background Image Canvas Wrapper -->
+                <div id="product-canvas-wrapper" class="relative w-full max-w-[620px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-cover bg-center transition-all duration-300" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80');">
+                    
+                    <!-- Subtle Dark Gradient Vignette for Legibility -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+
+                    <!-- Watermark Logo PD (Optional Branding Top Right) -->
+                    <div class="absolute top-4 right-4 flex items-center gap-2 bg-slate-950/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
+                        <svg viewBox="0 0 100 100" class="w-5 h-5 text-emerald-400 fill-current">
+                            <circle cx="50" cy="55" r="40" fill="none" stroke="currentColor" stroke-width="6" />
+                            <text x="50" y="65" font-family="Playfair Display, serif" font-size="34" font-weight="bold" text-anchor="middle" fill="currentColor">PD</text>
+                        </svg>
+                        <span class="text-[11px] font-serif tracking-widest text-white/90 font-bold">PD JEWELRY</span>
+                    </div>
+
+                    <!-- Top Left Product Label -->
+                    <div class="absolute top-4 left-4 text-white">
+                        <div id="preview-sku-tag" class="text-xs font-semibold tracking-wide bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-md border border-white/10 text-emerald-300 shadow">
+                            Mặt Dây Duyên Dáng PD-102
+                        </div>
+                        <div id="preview-material-tag" class="text-[10px] text-slate-300 mt-1 pl-1">
+                            Vàng 18K & Kim Cương
+                        </div>
+                    </div>
+
+                    <!-- DYNAMIC PRICE TAG CONTAINER (MODULAR OVERLAY) -->
+                    <div id="draggable-tag-wrapper" class="absolute bottom-4 right-4 left-4 sm:left-auto cursor-move transition-transform active:scale-[0.99]" title="Có thể kéo thả vị trí">
+
+                        <!-- ------------------------------------------------------------- -->
+                        <!-- TEMPLATE 1: DISCOUNT SLANTED DUAL PRICE TAG (Mẫu như hình) -->
+                        <!-- ------------------------------------------------------------- -->
+                        <div id="tag-template-discount" class="relative rounded-2xl overflow-hidden shadow-2xl flex items-stretch border border-white/20 text-white min-w-[320px] sm:min-w-[390px] h-20 sm:h-22 backdrop-blur-md transition-all duration-300">
+                            
+                            <!-- Left Block: Old Price (Subtle translucent Teal/Slate) -->
+                            <div id="tag-left-box" class="w-[42%] bg-[#123e3a]/90 flex flex-col justify-center px-4 py-2 relative z-10">
+                                <!-- Optional Logo inside tag -->
+                                <div id="tag-logo-box" class="flex items-center gap-1 mb-1">
+                                    <svg viewBox="0 0 100 100" class="w-3.5 h-3.5 text-emerald-300 fill-current">
+                                        <circle cx="50" cy="55" r="40" fill="none" stroke="currentColor" stroke-width="8" />
+                                        <text x="50" y="65" font-family="serif" font-size="38" font-weight="bold" text-anchor="middle" fill="currentColor">PD</text>
+                                    </svg>
+                                    <span class="text-[9px] tracking-wider text-emerald-200 font-medium">PD JEWELRY</span>
+                                </div>
+
+                                <span id="tag-label-old" class="text-[10px] tracking-wider uppercase text-slate-300 font-medium">GIÁ CŨ</span>
+                                <div class="relative inline-block w-fit">
+                                    <span id="tag-val-old" class="text-sm sm:text-base font-semibold text-slate-200/90 tracking-tight line-through decoration-red-400 decoration-2 font-mono">10.225.000đ</span>
+                                </div>
+                            </div>
+
+                            <!-- Right Block: New Discount Price (Slanted Teal / Emerald Overlay) -->
+                            <div id="tag-right-box" class="w-[62%] -ml-[4%] bg-gradient-to-r from-[#1e5d57] to-[#144843] clip-slanted-right flex flex-col justify-center pl-7 pr-4 py-2 relative z-20 border-l border-white/20 shadow-2xl">
+                                <span id="tag-label-new" class="text-[10px] sm:text-xs tracking-wider uppercase text-emerald-200 font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-bolt text-yellow-300 text-[10px]"></i> <span id="tag-label-new-text">CHỈ CÒN</span>
+                                </span>
+                                <span id="tag-val-new" class="text-xl sm:text-2xl font-black text-white tracking-tight drop-shadow-md font-mono mt-0.5">
+                                    9.202.500<span class="text-xs font-normal ml-0.5">đ</span>
+                                </span>
+                            </div>
+
+                            <!-- Discount percentage badge -->
+                            <div id="discount-badge" class="absolute -top-1 -right-1 bg-yellow-400 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-bl-lg rounded-tr-lg shadow-md border border-white/30 z-30 uppercase">
+                                -10%
+                            </div>
+                        </div>
+
+                        <!-- ------------------------------------------------------------- -->
+                        <!-- TEMPLATE 2: SINGLE PRICE TAG (Mẫu 1 Giá Niêm Yết) -->
+                        <!-- ------------------------------------------------------------- -->
+                        <div id="tag-template-single" class="hidden relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-r from-[#1e5d57]/95 to-[#123e3a]/95 backdrop-blur-md border border-white/20 text-white min-w-[280px] sm:min-w-[340px] p-3.5 sm:p-4 transition-all duration-300">
+                            <div class="flex items-center justify-between gap-4">
+                                <!-- Logo & Title -->
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-slate-900/50 border border-emerald-400/40 flex items-center justify-center p-1 shadow">
+                                        <svg viewBox="0 0 100 100" class="w-full h-full text-emerald-300 fill-current">
+                                            <circle cx="50" cy="55" r="40" fill="none" stroke="currentColor" stroke-width="8" />
+                                            <text x="50" y="65" font-family="serif" font-size="38" font-weight="bold" text-anchor="middle" fill="currentColor">PD</text>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div id="single-tag-brand" class="text-[10px] tracking-widest text-emerald-200 font-semibold uppercase">PD JEWELRY</div>
+                                        <div id="single-tag-label" class="text-xs text-slate-200 font-medium">GIÁ NIÊM YẾT</div>
+                                    </div>
+                                </div>
+
+                                <!-- Price Display -->
+                                <div class="text-right">
+                                    <div id="single-tag-price" class="text-xl sm:text-2xl font-extrabold text-white tracking-tight font-mono drop-shadow">
+                                        9.202.500<span class="text-xs font-normal ml-0.5">đ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Visual Presets Showcase Grid (Quick Comparison) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                    <i class="fa-solid fa-palette text-gold-400 mr-1.5"></i> Mẫu Tag Sẵn Có Để Tham Khảo:
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    
+                    <!-- Mini Card 1 -->
+                    <div onclick="setTemplate('discount')" class="p-3 rounded-xl bg-slate-800 border border-slate-700 hover:border-brand-500 cursor-pointer flex items-center justify-between group">
+                        <div>
+                            <div class="text-xs font-bold text-white group-hover:text-emerald-400">Bản 1: Tag Vát Góc Giảm Giá</div>
+                            <div class="text-[10px] text-slate-400">Có giá cũ gạch ngang + giá khuyến mãi</div>
+                        </div>
+                        <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">2 Giá</span>
+                    </div>
+
+                    <!-- Mini Card 2 -->
+                    <div onclick="setTemplate('single')" class="p-3 rounded-xl bg-slate-800 border border-slate-700 hover:border-brand-500 cursor-pointer flex items-center justify-between group">
+                        <div>
+                            <div class="text-xs font-bold text-white group-hover:text-emerald-400">Bản 2: Tag 1 Giá Niêm Yết</div>
+                            <div class="text-[10px] text-slate-400">Gọn gàng, sang trọng cho hàng mới về</div>
+                        </div>
+                        <span class="text-xs font-mono text-gold-400 bg-gold-500/10 px-2 py-1 rounded">1 Giá</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 mt-6 text-center text-xs text-slate-500">
+        <p>© 2026 PD Jewelry Brand System. Bản quyền bảng giá thuộc về cửa hàng trang sức PD.</p>
+    </footer>
+
+    <script>
+        // State variables
+        let currentTemplate = 'discount'; // 'discount' or 'single'
+        let currentTheme = 'teal';
+
+        // Initialize state on load
+        window.onload = function() {
+            updateValues();
+            setupDraggable();
+        };
+
+        // Format currency strings with thousand separators
+        function formatNumber(val) {
+            let num = val.replace(/\D/g, '');
+            if (!num) return '';
+            return new Intl.NumberFormat('vi-VN').format(num);
+        }
+
+        function formatAndUpdatePrice(inputId) {
+            const input = document.getElementById(inputId);
+            let rawVal = input.value;
+            let formatted = formatNumber(rawVal);
+            input.value = formatted;
+            updateValues();
+        }
+
+        // Switch template mode
+        function setTemplate(mode) {
+            currentTemplate = mode;
+
+            const btnDiscount = document.getElementById('btn-discount');
+            const btnSingle = document.getElementById('btn-single');
+            const containerOldPrice = document.getElementById('container-old-price');
+            const containerLabelOld = document.getElementById('container-label-old');
+            const labelNewPrice = document.getElementById('label-new-price');
+            const badgeMode = document.getElementById('badge-mode');
+
+            const tagDiscount = document.getElementById('tag-template-discount');
+            const tagSingle = document.getElementById('tag-template-single');
+
+            if (mode === 'discount') {
+                btnDiscount.className = "p-3 rounded-xl border border-brand-600 bg-brand-600/10 text-white flex flex-col items-center text-center transition hover:border-brand-500";
+                btnSingle.className = "p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-300 flex flex-col items-center text-center transition hover:border-brand-500";
+                
+                containerOldPrice.style.display = 'block';
+                containerLabelOld.style.display = 'block';
+                labelNewPrice.innerText = 'Giá Ưu Đãi (đ)';
+                badgeMode.innerText = 'Bản Giảm Giá';
+                badgeMode.className = 'text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono';
+
+                tagDiscount.classList.remove('hidden');
+                tagSingle.classList.add('hidden');
+            } else {
+                btnSingle.className = "p-3 rounded-xl border border-brand-600 bg-brand-600/10 text-white flex flex-col items-center text-center transition hover:border-brand-500";
+                btnDiscount.className = "p-3 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-300 flex flex-col items-center text-center transition hover:border-brand-500";
+                
+                containerOldPrice.style.display = 'none';
+                containerLabelOld.style.display = 'none';
+                labelNewPrice.innerText = 'Giá Bán / Niêm Yết (đ)';
+                badgeMode.innerText = 'Bản 1 Giá';
+                badgeMode.className = 'text-[11px] px-2 py-0.5 rounded bg-gold-500/10 text-gold-400 border border-gold-500/20 font-mono';
+
+                tagDiscount.classList.add('hidden');
+                tagSingle.classList.remove('hidden');
+            }
+
+            updateValues();
+        }
+
+        // Color theme switcher
+        function setColorTheme(theme) {
+            currentTheme = theme;
+            const leftBox = document.getElementById('tag-left-box');
+            const rightBox = document.getElementById('tag-right-box');
+            const singleTag = document.getElementById('tag-template-single');
+
+            if (theme === 'teal') {
+                leftBox.style.backgroundColor = 'rgba(18, 62, 58, 0.92)';
+                rightBox.className = 'w-[62%] -ml-[4%] bg-gradient-to-r from-[#1e5d57] to-[#144843] clip-slanted-right flex flex-col justify-center pl-7 pr-4 py-2 relative z-20 border-l border-white/20 shadow-2xl';
+                singleTag.className = 'relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-r from-[#1e5d57]/95 to-[#123e3a]/95 backdrop-blur-md border border-white/20 text-white min-w-[280px] sm:min-w-[340px] p-3.5 sm:p-4 transition-all duration-300';
+            } else if (theme === 'emerald') {
+                leftBox.style.backgroundColor = 'rgba(6, 78, 59, 0.92)';
+                rightBox.className = 'w-[62%] -ml-[4%] bg-gradient-to-r from-emerald-700 to-emerald-900 clip-slanted-right flex flex-col justify-center pl-7 pr-4 py-2 relative z-20 border-l border-white/20 shadow-2xl';
+                singleTag.className = 'relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-r from-emerald-800/95 to-emerald-950/95 backdrop-blur-md border border-white/20 text-white min-w-[280px] sm:min-w-[340px] p-3.5 sm:p-4 transition-all duration-300';
+            } else if (theme === 'dark') {
+                leftBox.style.backgroundColor = 'rgba(15, 23, 42, 0.92)';
+                rightBox.className = 'w-[62%] -ml-[4%] bg-gradient-to-r from-slate-900 to-black clip-slanted-right flex flex-col justify-center pl-7 pr-4 py-2 relative z-20 border-l border-white/20 shadow-2xl';
+                singleTag.className = 'relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-r from-slate-900/95 to-slate-950/95 backdrop-blur-md border border-white/20 text-white min-w-[280px] sm:min-w-[340px] p-3.5 sm:p-4 transition-all duration-300';
+            } else if (theme === 'gold') {
+                leftBox.style.backgroundColor = 'rgba(30, 27, 22, 0.92)';
+                rightBox.className = 'w-[62%] -ml-[4%] bg-gradient-to-r from-amber-600 to-yellow-600 clip-slanted-right flex flex-col justify-center pl-7 pr-4 py-2 relative z-20 border-l border-white/20 shadow-2xl';
+                singleTag.className = 'relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-r from-amber-700/95 to-yellow-800/95 backdrop-blur-md border border-white/20 text-white min-w-[280px] sm:min-w-[340px] p-3.5 sm:p-4 transition-all duration-300';
+            }
+        }
+
+        // Live text update logic
+        function updateValues() {
+            const sku = document.getElementById('input-sku').value || 'SP-001';
+            const material = document.getElementById('input-material').value || '';
+            const oldPrice = document.getElementById('input-old-price').value || '0';
+            const newPrice = document.getElementById('input-new-price').value || '0';
+            const labelOld = document.getElementById('input-label-old').value || 'GIÁ CŨ';
+            const labelNew = document.getElementById('input-label-new').value || 'CHỈ CÒN';
+            
+            const showLogo = document.getElementById('toggle-logo').checked;
+            const showCurr = document.getElementById('toggle-currency').checked;
+
+            const unit = showCurr ? 'đ' : '';
+
+            // Update Top Left Info
+            document.getElementById('preview-sku-tag').innerText = sku;
+            document.getElementById('preview-material-tag').innerText = material;
+
+            // Update Discount Tag
+            document.getElementById('tag-label-old').innerText = labelOld;
+            document.getElementById('tag-val-old').innerText = oldPrice + unit;
+
+            document.getElementById('tag-label-new-text').innerText = labelNew;
+            document.getElementById('tag-val-new').innerHTML = `${newPrice}<span class="text-xs font-normal ml-0.5">${unit}</span>`;
+
+            // Calculate percentage discount if valid numbers
+            const numOld = parseInt(oldPrice.replace(/\D/g, ''));
+            const numNew = parseInt(newPrice.replace(/\D/g, ''));
+            const badge = document.getElementById('discount-badge');
+
+            if (numOld && numNew && numOld > numNew) {
+                const pct = Math.round(((numOld - numNew) / numOld) * 100);
+                badge.innerText = `-${pct}%`;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Update Logo Visibility
+            document.getElementById('tag-logo-box').style.display = showLogo ? 'flex' : 'none';
+
+            // Update Single Tag
+            document.getElementById('single-tag-label').innerText = labelNew === 'CHỈ CÒN' ? 'GIÁ NIÊM YẾT' : labelNew;
+            document.getElementById('single-tag-price').innerHTML = `${newPrice}<span class="text-xs font-normal ml-0.5">${unit}</span>`;
+        }
+
+        // Switch background preset photos
+        function setBgPreset(type) {
+            const wrapper = document.getElementById('product-canvas-wrapper');
+            if (type === 'box') {
+                wrapper.style.backgroundImage = "url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80')";
+            } else if (type === 'ring') {
+                wrapper.style.backgroundImage = "url('https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=80')";
+            }
+        }
+
+        // Handle user uploaded photo
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const wrapper = document.getElementById('product-canvas-wrapper');
+                    wrapper.style.backgroundImage = `url('${event.target.result}')`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Draggable tag functionality on canvas
+        function setupDraggable() {
+            const dragItem = document.getElementById("draggable-tag-wrapper");
+            const container = document.getElementById("product-canvas-wrapper");
+
+            let active = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            let xOffset = 0;
+            let yOffset = 0;
+
+            container.addEventListener("touchstart", dragStart, false);
+            container.addEventListener("touchend", dragEnd, false);
+            container.addEventListener("touchmove", drag, false);
+
+            container.addEventListener("mousedown", dragStart, false);
+            container.addEventListener("mouseup", dragEnd, false);
+            container.addEventListener("mousemove", drag, false);
+
+            function dragStart(e) {
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+
+                if (e.target === dragItem || dragItem.contains(e.target)) {
+                    active = true;
+                }
+            }
+
+            function dragEnd(e) {
+                initialX = currentX;
+                initialY = currentY;
+                active = false;
+            }
+
+            function drag(e) {
+                if (active) {
+                    e.preventDefault();
+                    if (e.type === "touchmove") {
+                        currentX = e.touches[0].clientX - initialX;
+                        currentY = e.touches[0].clientY - initialY;
+                    } else {
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                    }
+
+                    xOffset = currentX;
+                    yOffset = currentY;
+
+                    setTranslate(currentX, currentY, dragItem);
+                }
+            }
+
+            function setTranslate(xPos, yPos, el) {
+                el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+            }
+        }
+
+        // Download tag graphic only as PNG
+        function downloadTagOnly() {
+            const target = currentTemplate === 'discount' 
+                ? document.getElementById('tag-template-discount') 
+                : document.getElementById('tag-template-single');
+
+            html2canvas(target, {
+                backgroundColor: null,
+                scale: 3,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Tag-Gia-PD-Jewelry-${currentTemplate}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Download complete composite photo with tag
+        function downloadFullComposite() {
+            const target = document.getElementById('product-canvas-wrapper');
+
+            html2canvas(target, {
+                scale: 2,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Anh-Trang-Suc-PD-Jewelry.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
